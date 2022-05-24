@@ -1,0 +1,81 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.1;
+
+//import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+//import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract nft1 {
+    
+    // Token name
+    string private _name;
+
+    // Token symbol
+    string private _symbol;
+
+    // Mapping from token ID to owner address
+    mapping(uint256 => address) private _owners;
+    
+    // Mapping owner address to token count
+    mapping(address => uint256) private _balances;
+
+    // Mapping from token ID to approved address
+    mapping(uint256 => address) private _tokenApprovals;
+
+    // Optional mapping for token URIs
+    mapping (uint256 => string) private _tokenURIs;
+
+    /**
+     * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
+     */
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+
+    constructor(string memory name_, string memory symbol_) {
+        _name = name_;
+        _symbol = symbol_;
+    }
+
+    function _mint(address to, uint256 tokenId) public virtual {
+        require(to != address(0), "ERC721: mint to the zero address");
+        require(_owners[tokenId] == address(0), "ERC721: token already minted");
+
+        _balances[to] += 1;
+        _owners[tokenId] = to;
+
+        //emit Transfer(address(0), to, tokenId);
+    }
+
+    function _transfer(address from, address to, uint256 tokenId) public virtual {
+        require(ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
+        require(to != address(0), "ERC721: transfer to the zero address");
+
+        // Clear approvals from the previous owner
+        _approve(address(0), tokenId);
+
+        _balances[from] -= 1;
+        _balances[to] += 1;
+        _owners[tokenId] = to;
+
+    }
+
+    function _approve(address to, uint256 tokenId) public virtual {
+        _tokenApprovals[tokenId] = to;
+    }
+
+    function ownerOf(uint256 tokenId) public view virtual returns (address) {
+        address owner = _owners[tokenId];
+        require(owner != address(0), "ERC721: owner query for nonexistent token");
+        return owner;
+    }
+
+    function balanceOf(address owner) public view virtual returns (uint256) {
+        require(owner != address(0), "ERC721: address zero is not a valid owner");
+        return _balances[owner];
+    }
+
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+        require(_owners[tokenId] != address(0), "ERC721: token already minted");
+        _tokenURIs[tokenId] = _tokenURI;
+    }
+
+
+}
